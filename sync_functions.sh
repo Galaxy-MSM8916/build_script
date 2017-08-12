@@ -13,6 +13,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+function sync_manifests {
+	if [ "x$ver" == "x13.0" ]; then
+		manifest_name=los-13.0_manifest.xml
+	else
+		manifest_name=los-14.1_manifest.xml
+	fi
+	manifest_dir=${BUILD_TOP}/.repo/local_manifests
+	manifest_url="https://raw.githubusercontent.com/Galaxy-MSM8916/local_manifests/master"
+
+	if [ "x${manifest_name}" != "x" ]; then
+		mkdir -p ${manifest_dir}
+		logb "Removing old manifests..."
+		rm ${manifest_dir}/*xml
+
+		logb "Syncing manifests..."
+		${CURL} ${url}/${manifest_name} | tee ${manifest_dir}/${manifest_name} > /dev/null
+	fi
+
+    # Sync the substratum manifest
+    if [ ! -f ${manifest_dir}/substratum.xml ] && [ "x$ver" == "x14.1" ]; then
+		logb "Syncing Substratum manifest..."
+		mkdir -p .repo/local_manifests
+		${CURL} --output ${manifest_dir}/substratum.xml \
+		https://raw.githubusercontent.com/LineageOMS/merge_script/master/substratum.xml
+    fi
+}
+
 function sync_vendor_trees {
 if [ -n "$SYNC_VENDOR" ]; then
 	logb "Syncing vendor trees..."

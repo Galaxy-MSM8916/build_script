@@ -264,6 +264,8 @@ if [ "x$UPDATE_SCRIPT" == "x" ]; then
 	reverse_patch
 	# get the platform info
 	get_platform_info
+	# sync manifests
+	sync_manifests
 	# sync the repos
 	sync_vendor_trees "$@"
 	sync_all_trees "$@"
