@@ -19,6 +19,8 @@ function make_targets {
 		exit_on_failure make -j${JOB_NUMBER} $BUILD_TARGET CM_UPDATER_OTA_URI="cm.updater.uri=http://ota13.msm8916.com/api" CM_BUILDTYPE=NIGHTLY
 	elif [ "x$ver" == "x14.1" ]; then
 		exit_on_failure make -j${JOB_NUMBER} $BUILD_TARGET CM_UPDATER_OTA_URI="cm.updater.uri=http://ota14.msm8916.com/api" CM_BUILDTYPE=NIGHTLY
+	elif [ "x$ver" == "x15.0" ]; then
+		exit_on_failure make -j${JOB_NUMBER} $BUILD_TARGET CM_UPDATER_OTA_URI="cm.updater.uri=http://ota15.msm8916.com/api" CM_BUILDTYPE=NIGHTLY
 	else
 		exit_on_failure make -j${JOB_NUMBER} $BUILD_TARGET CM_UPDATER_OTA_URI="cm.updater.uri=http://ota.msm8916.com/api" CM_BUILDTYPE=NIGHTLY
 	fi

@@ -16,8 +16,10 @@
 function sync_manifests {
 	if [ "x$ver" == "x13.0" ]; then
 		manifest_name=los-13.0_manifest.xml
-	else
+	elif [ "x$ver" == "x14.1" ]; then
 		manifest_name=los-14.1_manifest.xml
+	elif [ "x$ver" == "x15.0" ]; then
+		manifest_name=los-15.0_manifest.xml
 	fi
 	manifest_dir=${BUILD_TOP}/.repo/local_manifests
 	manifest_url="https://raw.githubusercontent.com/Galaxy-MSM8916/local_manifests/master"
