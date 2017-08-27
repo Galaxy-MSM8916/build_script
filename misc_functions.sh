@@ -65,13 +65,6 @@ function exit_on_failure {
 	exit_error $?
 }
 
-function print_to_telegram {
-#	if [ "x$PRINT_VIA_PROXY" != "x" ] && [ "x$SYNC_HOST" != "x" ]; then
-		timeout -s 9 20 ssh $SYNC_HOST wget \'"https://api.telegram.org/bot${BUILD_TELEGRAM_TOKEN}/sendMessage?chat_id=${BUILD_TELEGRAM_CHATID}&text=$@"\' -O - > /dev/null 2>/dev/null
-#	else
-#		timeout -s 9 10 wget "https://api.telegram.org/bot${BUILD_TELEGRAM_TOKEN}/sendMessage?chat_id=${BUILD_TELEGRAM_CHATID}&text=$@" -O - > /dev/null 2>/dev/null
-#	fi
-}
 
 function exit_error {
 	if [ "x$1" != "x0" ]; then
@@ -79,7 +72,12 @@ function exit_error {
 		if [ "x$SILENT" != "x1" ]; then
 			dateStr=`TZ='UTC' date +'[%H:%M:%S UTC]'`
 			textStr="${dateStr}[${BUILD_TARGET}] ${distroTxt} ${ver} build %23${JOB_BUILD_NUMBER} for ${DEVICE_NAME} device on ${USER}@${HOSTNAME} aborted."
-			print_to_telegram $textStr
+			if [ "x$PRINT_VIA_PROXY" != "x" ] && [ "x$SYNC_HOST" != "x" ]; then
+				timeout -s 9 20 ssh $SYNC_HOST wget \'"https://api.telegram.org/bot${BUILD_TELEGRAM_TOKEN}/sendMessage?chat_id=${BUILD_TELEGRAM_CHATID}&text=$textStr"\' -O - > /dev/null 2>/dev/null
+			else
+
+				timeout -s 9 10 wget "https://api.telegram.org/bot${BUILD_TELEGRAM_TOKEN}/sendMessage?chat_id=${BUILD_TELEGRAM_CHATID}&text=$textStr" -O - /dev/null 2>/dev/null
+			fi
 		fi
 		# remove the temp dir
 		echoText "Removing temp dir..."
