@@ -70,8 +70,27 @@ function exit_error {
 	if [ "x$1" != "x0" ]; then
 		echoText "Error encountered, aborting..."
 		if [ "x$SILENT" != "x1" ]; then
-			dateStr=`TZ='UTC' date +'[%H:%M:%S UTC]'`
-			textStr="${dateStr}[${BUILD_TARGET}] ${distroTxt} ${ver} build %23${JOB_BUILD_NUMBER} for ${DEVICE_NAME} device on ${USER}@${HOSTNAME} aborted."
+			END_TIME=$( date +%s )
+			buildTime="%0A%0ABuild time: $(format_time ${END_TIME} ${BUILD_START_TIME})"
+			totalTime="%0ATotal time: $(format_time ${END_TIME} ${START_TIME})"
+
+			if [ "x$JOB_DESCRIPTION" != "x" ]; then
+				textStr="$JOB_DESCRIPTION, build %23${JOB_BUILD_NUMBER}"
+			else
+				textStr="${distroTxt} ${ver} ${BUILD_TARGET} for the ${DEVICE_NAME}"
+			fi
+
+			textStr+=" aborted."
+
+			textStr+="%0A%0AThis build was running on ${USER}@${HOSTNAME}."
+
+			if [ "x${JOB_URL}" != "x" ]; then
+				textStr+="%0A%0AYou can see the build log at:"
+				textStr+="%0A${JOB_URL}/console"
+			fi
+
+			textStr+="${buildTime}${totalTime}"
+
 			if [ "x$PRINT_VIA_PROXY" != "x" ] && [ "x$SYNC_HOST" != "x" ]; then
 				timeout -s 9 20 ssh $SYNC_HOST wget \'"https://api.telegram.org/bot${BUILD_TELEGRAM_TOKEN}/sendMessage?chat_id=${BUILD_TELEGRAM_CHATID}&text=$textStr"\' -O - > /dev/null 2>/dev/null
 			else

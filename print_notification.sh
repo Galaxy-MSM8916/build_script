@@ -32,16 +32,15 @@ function print_start_build {
 			BUILD_START_TIME=$(date +%s)
 
 			if [ "x$JOB_DESCRIPTION" != "x" ]; then
-				textStr="Building: $JOB_DESCRIPTION"
-				textStr+="%0ADevice codename: $DEVICE_NAME"
+				textStr="${JOB_DESCRIPTION}, build %23${JOB_BUILD_NUMBER} started."
+				textStr+="%0A%0AThe device's codename is ${DEVICE_NAME}."
 			else
 				textStr="Building: ${distroTxt} ${ver} for the ${DEVICE_NAME}"
-				textStr+="%0ABuild target: $BUILD_TARGET"
+				textStr+="%0A%0ABuild target: $BUILD_TARGET"
 			fi
 
-			textStr+="%0ABuild number: $JOB_BUILD_NUMBER"
-			textStr+="%0ABuild host: ${USER}@${HOSTNAME}"
-			textStr+="%0AStart time: ${dateStr}"
+			textStr+="%0A%0AThis build is running on ${USER}@${HOSTNAME}"
+			textStr+="%0A%0AStart time: ${dateStr}"
 
 			if [ "x${JOB_URL}" != "x" ]; then
 				textStr+="%0A%0AYou can monitor this build's progress at:"
@@ -66,7 +65,7 @@ function print_end_build {
 		link="https://jobs.msm8916.com${r_dir}"
 
 		END_TIME=$( date +%s )
-		buildTime="%0ABuild time: $(format_time ${END_TIME} ${BUILD_START_TIME})"
+		buildTime="%0A%0ABuild time: $(format_time ${END_TIME} ${BUILD_START_TIME})"
 		totalTime="%0ATotal time: $(format_time ${END_TIME} ${START_TIME})"
 
 
@@ -78,28 +77,28 @@ function print_end_build {
 			boot_tar_name=bootimage_j${JOB_BUILD_NUMBER}_$(date +%Y%m%d)-${DEVICE_NAME}.tar
 
 			if [ "$BUILD_TARGET" == "recoveryimage" ]; then
-				str_rec="%0ARecovery: ${link}/builds/recovery/${DEVICE_NAME}/${rec_name}.tar"
+				str_rec="%0A%0ARecovery: ${link}/builds/recovery/${DEVICE_NAME}/${rec_name}.tar"
 			elif [ "$BUILD_TARGET" == "bootimage" ]; then
-				str_boot1="%0ABoot zip package: ${link}/builds/boot/${bimg_name}.zip"
-				str_boot2="%0ABoot (ODIN package): ${link}/builds/boot/${boot_tar_name}"
+				str_boot1="%0A%0ABoot zip package: ${link}/builds/boot/${bimg_name}.zip"
+				str_boot2="%0A%0ABoot (ODIN package): ${link}/builds/boot/${boot_tar_name}"
 				str_boot=${str_boot1}${str_boot2}
 			elif [ "$BUILD_TARGET" == "otapackage" ]; then
-				str_rom="%0A ROM: ${link}/builds/full/${arc_name}.zip"
-				str_rec="%0A Recovery: ${link}/builds/recovery/${DEVICE_NAME}/${rec_name}.tar"
+				str_rom="%0A%0A ROM: ${link}/builds/full/${arc_name}.zip"
+				str_rec="%0A%0A Recovery: ${link}/builds/recovery/${DEVICE_NAME}/${rec_name}.tar"
 			fi
-			str_changelog="%0AChangelog: ${link}/builds/full/changelog-${arc_name}.txt"
-			str_blurb="%0A%0AYou can flash boot/recovery images using ODIN or you can extract them using 7zip or tar under Linux and flash using TWRP."
+			str_changelog="%0A%0AChangelog: ${link}/builds/full/changelog-${arc_name}.txt"
+			str_blurb="%0A%0AYou can flash boot/recovery images using ODIN or you can extract them using 7zip on Windows or tar under Linux and flash using TWRP."
 		fi
 
 		if [ "x$JOB_DESCRIPTION" != "x" ]; then
-			str_main="$JOB_DESCRIPTION"
+			str_main="$JOB_DESCRIPTION, build %23${JOB_BUILD_NUMBER}"
 		else
 			str_main="${distroTxt} ${ver} ${BUILD_TARGET} for the ${DEVICE_NAME}"
 		fi
 
 		str_main+=" completed successfully."
-		str_main+="%0A%0ABuild number: $JOB_BUILD_NUMBER"
-		str_main+="%0ABuild host: ${USER}@${HOSTNAME}"
+
+		textStr="${str_main}${str_rom}${str_rec}${str_boot}${str_changelog}${str_blurb}${buildTime}${totalTime}"
 
 		textStr=$(echo $textStr |sed s'/\/\//\//'g)
 		textStr=$(echo $textStr |sed s'/http:\//http:\/\//'g)
