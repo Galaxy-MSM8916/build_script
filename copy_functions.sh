@@ -50,22 +50,23 @@ function copy_bootimage {
 	if [ "x$BUILD_TARGET" == "xbootimage" ] && [ "x$NO_PACK_BOOTIMAGE" == "x" ]; then
 		boot_pkg_dir=${BUILD_TEMP}/boot_pkg
 		if [ "x$DISTRIBUTION" == "xlineage" ] || [ "x$DISTRIBUTION" == "xRR" ]; then
-			boot_pkg_zip=${BUILD_TEMP}/boot_caf-based_j${JOB_BUILD_NUMBER}_$(date +%Y%m%d)-${DEVICE_NAME}.zip
+			boot_pkg_zip=${ARTIFACT_OUT_DIR}/boot_caf-based_j${JOB_BUILD_NUMBER}_$(date +%Y%m%d)-${DEVICE_NAME}.zip
 		else
-			boot_pkg_zip=${BUILD_TEMP}/boot_aosp-based_j${JOB_BUILD_NUMBER}_$(date +%Y%m%d)-${DEVICE_NAME}.zip
+			boot_pkg_zip=${ARTIFACT_OUT_DIR}/boot_aosp-based_j${JOB_BUILD_NUMBER}_$(date +%Y%m%d)-${DEVICE_NAME}.zip
 		fi
 
 		boot_tar_name=bootimage_j${JOB_BUILD_NUMBER}_$(date +%Y%m%d)-${DEVICE_NAME}.tar
 
 		revert_pkg_dir=${BUILD_TEMP}/boot_pkg_revert
-		revert_zip=${BUILD_TEMP}/revert_boot_image_j${JOB_BUILD_NUMBER}_$(date +%Y%m%d)-${DEVICE_NAME}.zip
+		revert_zip=${ARTIFACT_OUT_DIR}/revert_boot_image_j${JOB_BUILD_NUMBER}_$(date +%Y%m%d)-${DEVICE_NAME}.zip
 		binary_target_dir=META-INF/com/google/android
 		install_target_dir=install/bin
 		blob_dir=blobs
 		proprietary_dir=proprietary
 
 		# create odin package
-		tar -C ${ANDROID_PRODUCT_OUT}/ boot.img -c -f ${BUILD_TEMP}/${boot_tar_name}
+		echoTextBlue "Creating ODIN-Flashable boot image..."
+		tar -C ${ANDROID_PROUCT_OUT}/ boot.img -c -f ${ARTIFACT_OUT_DIR}/${boot_tar_name}
 
 		# create the directories
 		exit_on_failure mkdir -p ${boot_pkg_dir}/${binary_target_dir}
@@ -110,21 +111,11 @@ function copy_bootimage {
 		echoTextBlue "Creating flashables..."
 		cd ${boot_pkg_dir} && zip ${boot_pkg_zip} `find ${boot_pkg_dir} -type f | cut -c $(($(echo ${boot_pkg_dir}|wc -c)+1))-`
 		cd ${revert_pkg_dir} && zip ${revert_zip} `find ${revert_pkg_dir} -type f | cut -c $(($(echo ${revert_pkg_dir}|wc -c)+1))-`
-		echoTextBlue "Copying boot image..."
-		rsync_cp ${boot_pkg_zip} ${OUTPUT_DIR}/builds/boot/
-		rsync_cp ${BUILD_TEMP}/${boot_tar_name} ${OUTPUT_DIR}/builds/boot/
-
-		echoTextBlue "Copying reversion zip..."
-		rsync_cp ${revert_zip} ${OUTPUT_DIR}/builds/boot/
 	fi
 }
 
 function copy_recoveryimage {
 	if [ -e ${ANDROID_PRODUCT_OUT}/recovery.img ]; then
-		#copy the recovery image
-		cp ${ANDROID_PRODUCT_OUT}/recovery.img $BUILD_TEMP
-		cd $BUILD_TEMP
-		#archive the image
 		#define some variables
 		if [ -z ${JOB_BUILD_NUMBER} ]; then
 			rec_name=${recovery_flavour}-${DISTRIBUTION}-${ver}-$(date +%Y%m%d)-${DEVICE_NAME}
@@ -133,58 +124,35 @@ function copy_recoveryimage {
 		fi
 
 		logb "\n\t\tCopying recovery image...\n"
-		tar -C ${ANDROID_PRODUCT_OUT}/ recovery.img -c -f ${rec_name}.tar
-		rsync_cp ${rec_name}.tar ${OUTPUT_DIR}/builds/recovery/${DEVICE_NAME}/${rec_name}.tar
+		tar -C ${ANDROID_PRODUCT_OUT}/ recovery.img -c -f ${ARTIFACT_OUT_DIR}/${rec_name}.tar
 	fi
 }
 
 function copy_otapackage {
 	if [ "x$BUILD_TARGET" == "xotapackage" ]; then
-		ota_out=${DISTRIBUTION}_${DEVICE_NAME}-ota-${BUILD_NUMBER}.zip
-		if ! [ -e ${ANDROID_PRODUCT_OUT}/${ota_out} ]; then
-			logb "\nSearching for OTA package..."
-			ota_out=`basename $(find ${ANDROID_PRODUCT_OUT} -maxdepth 1 -type f -name '*zip' | head -1) 2>/dev/null`
+		logb "\nSearching for OTA package..."
+		OTA_FILE=`find ${ANDROID_PRODUCT_OUT} -maxdepth 1 -type f -name '*zip' 2>/dev/null | head -1 2>/dev/null`
 
-			if [ "x$ota_out" == "x" ]; then
-				echoText "Failed to find ota package!!"
-				exit_error 1
-			fi
-		fi
-		logb "\nFound ota package $ota_out"
-
-		#define some variables
-		if [ "x${JOB_BUILD_NUMBER}" == "x" ]; then
-			rec_name=${recovery_flavour}-${DISTRIBUTION}-${ver}-${DEVICE_NAME}
-			arc_name=${DISTRIBUTION}-${ver}-$(date +%Y%m%d)-${release_type}-${DEVICE_NAME}
+		if [ "x$OTA_FILE" == "x" ]; then
+			echoText "Failed to find ota package!!"
 		else
-			rec_name=${recovery_flavour}-${DISTRIBUTION}-${ver}_j${JOB_BUILD_NUMBER}_$(date +%Y%m%d)_${DEVICE_NAME}
-			arc_name=${DISTRIBUTION}-${ver}_j${JOB_BUILD_NUMBER}_$(date +%Y%m%d)_${release_type}-${DEVICE_NAME}
+			echoTextBlue "Found ota package $OTA_FILE"
+
+			#define some variables
+			if [ "x${JOB_BUILD_NUMBER}" == "x" ]; then
+				arc_name=${DISTRIBUTION}-${ver}-$(date +%Y%m%d)-${release_type}-${DEVICE_NAME}
+			else
+				arc_name=${DISTRIBUTION}-${ver}_j${JOB_BUILD_NUMBER}_$(date +%Y%m%d)_${release_type}-${DEVICE_NAME}
+			fi
+
+			#copy the zip in the background
+			logb "\n\t\tCopying zip image..."
+			cp ${OTA_FILE} ${ARTIFACT_OUT_DIR}/${arc_name}.zip
+
+			#calculate md5sums
+			md5sums=$(md5sum ${OTA_FILE} | cut -d " " -f 1)
+			echo "${md5sums} ${arc_name}.zip" > ${ARTIFACT_OUT_DIR}/${arc_name}.zip.md5 || exit_error 1
 		fi
-
-		#check if our correct binary exists
-		if [ -e ${BUILD_TOP}/META-INF ]; then
-			ota_bin="META-INF/com/google/android/update-binary"
-
-			logb "\t\tFound update binary..."
-			cp -dpR ${BUILD_TOP}/META-INF $BUILD_TEMP/META-INF
-			cp -ndpR ${BUILD_TOP}/META-INF ./
-			#delete the old binary
-			logb "\t\tPatching zip file unconditionally..."
-			zip -d ${ANDROID_PRODUCT_OUT}/${ota_out} ${ota_bin}
-			zip -ur ${ANDROID_PRODUCT_OUT}/${ota_out} ${ota_bin}
-		fi
-
-		#copy the zip in the background
-		logb "\n\t\tCopying zip image..."
-
-		# don't copy in the backgroud if we're not making the ODIN archive as well.
-		rsync_cp ${ANDROID_PRODUCT_OUT}/${ota_out} ${OUTPUT_DIR}/builds/full/${arc_name}.zip
-
-		#calculate md5sums
-		md5sums=$(md5sum ${ANDROID_PRODUCT_OUT}/${ota_out} | cut -d " " -f 1)
-
-		echo "${md5sums} ${arc_name}.zip" > ${BUILD_TEMP}/${arc_name}.zip.md5 || exit_error 1
-		rsync_cp ${BUILD_TEMP}/${arc_name}.zip.md5 ${OUTPUT_DIR}/builds/full/${arc_name}.zip.md5
 	fi
 }
 
@@ -203,24 +171,19 @@ function copy_odin_package {
 		ln system.img system.img.ext4
 
 		#pack the image
-		tar -H ustar -c boot.img recovery.img system.img.ext4 -f ${BUILD_TEMP}/${arc_name}.tar
+		tar -H ustar -c boot.img recovery.img system.img.ext4 -f ${ARTIFACT_OUT_DIR}/${arc_name}.tar
 
 		# remove the system image
 		rm system.img.ext4
 
-		cd $BUILD_TEMP
+		cd ${ARTIFACT_OUT_DIR}
 		#calculate the md5sum
-		md5sum -t ${arc_name}.tar >> ${arc_name}.tar
-		mv -f ${arc_name}.tar ${arc_name}.tar.md5
-		logb "\n\t\tCompressing ODIN-flashable image..."
+		md5sum -t ${arc_name}.tar >> ${ARTIFACT_OUT_DIR}/${arc_name}.tar
+		mv -f  ${ARTIFACT_OUT_DIR}/${arc_name}.tar ${ARTIFACT_OUT_DIR}/${arc_name}.tar.md5
 
+		logb "\n\t\tCompressing ODIN-flashable image..."
 		#compress the image
 		exit_on_failure 7z a ${arc_name}.tar.md5.7z ${arc_name}.tar.md5
-
-		logb "\n\t\tCopying ODIN-flashable compressed image..."
-		#copy it to the output dir
-		remote_mkdir ${OUTPUT_DIR}/builds/odin
-		rsync_cp ${arc_name}.tar.md5.7z ${OUTPUT_DIR}/builds/odin/
 	fi
 }
 
@@ -234,4 +197,10 @@ function copy_files {
 		echoTextBlue "Running function ${COPY_FUNCTIONS[$ix]}"
 		${COPY_FUNCTIONS[$ix]} $@
 	done
+}
+
+function upload_artifacts {
+	echoTextBlue "Transferring build artifacts..."
+	remote_mkdir ${OUTPUT_DIR}
+	rsync_cp ${ARTIFACT_OUT_DIR} ${OUTPUT_DIR}
 }
