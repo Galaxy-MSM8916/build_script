@@ -62,7 +62,7 @@ function print_end_build {
 	if [ "x$SILENT" != "x1" ]; then
 		target_str_len=$(echo /var/lib/jenkins/jobs | wc -c)
 		r_dir=$(echo $OUTPUT_DIR | cut -c ${target_str_len}-)
-		link="https://jobs.msm8916.com${r_dir}"
+		link="https://artifacts.msm8916.com${r_dir}"
 
 		END_TIME=$( date +%s )
 		buildTime="%0A%0ABuild time: $(format_time ${END_TIME} ${BUILD_START_TIME})"
