@@ -42,21 +42,51 @@ function check_if_build_running {
 	echoTextBlue "Lock acquired. PID is ${pid}"
 }
 
+build_state_file=/var/tmp/android_build_args
+
+function save_build_state {
+	# save build state in the event a build terminates and another is enqueued
+	if [ "x${BUILD_TARGET}" != "x" ] && [ "x${BUILD_VARIANT}" != "x" ]; then
+		# remove and re-add --description arg to properly enclose in quotes
+		args=`echo $@ | sed s'/--description[ a-zA-Z0-9\.\-]*\ \-/ -/'g`
+		[ -n "$JOB_DESCRIPTION" ] && args+=" --description '$JOB_DESCRIPTION'"
+
+		# saves a file with the exact arguments used to launch the build
+		echo $args > $build_state_file
+	fi
+}
+
+function restore_saved_build_state {
+	if [ "x${BUILD_TARGET}" != "x" ] && [ "x${BUILD_VARIANT}" != "x" ]; then
+		while [ -f "$build_state_file" ]; do
+			echoText "Starting previously terminated build from saved build state.."
+			program_args=`cat $build_state_file`
+			rm $build_state_file
+			echoTextBlue "Launching terminated build with args $program_args .."
+			$0 $program_args
+		done
+	fi
+}
+
 function clean_target {
 	#start cleaning up
 	echoText "Removing temp dir..."
 	rm -r $BUILD_TEMP
+
+	echoText "Removing saved build state info.."
+	rm -f $build_state_file
+
 	echoText "Cleaning build dir..."
 	cd ${ANDROID_BUILD_TOP}/
-	echoText "Removing lock..."
-		exec 200>&-
-	rm ${lock}
-
 	if [ "x${CLEAN_TARGET_OUT}" != "x" ] && [ ${CLEAN_TARGET_OUT} -eq 1 ]; then
 		if [ "x$BUILD_TARGET" == "xotapackage" ]; then
 			make clean
 		fi
 	fi
+
+	echoText "Removing lock..."
+	exec 200>&-
+	rm ${lock}
 }
 
 function exit_on_failure {
