@@ -13,79 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function copy_bootimage {
-	if [ "x$BUILD_TARGET" == "xbootimage" ] && [ "x$NO_PACK_BOOTIMAGE" == "x" ]; then
-		boot_pkg_dir=${BUILD_TEMP}/boot_pkg
-		if [ "x$DISTRIBUTION" == "xlineage" ] || [ "x$DISTRIBUTION" == "xRR" ]; then
-			boot_pkg_zip=${BUILD_TEMP}/boot_caf-based_j${JOB_BUILD_NUMBER}_$(date +%Y%m%d)-${DEVICE_NAME}.zip
-		else
-			boot_pkg_zip=${BUILD_TEMP}/boot_aosp-based_j${JOB_BUILD_NUMBER}_$(date +%Y%m%d)-${DEVICE_NAME}.zip
-		fi
-
-		boot_tar_name=bootimage_j${JOB_BUILD_NUMBER}_$(date +%Y%m%d)-${DEVICE_NAME}.tar
-
-		revert_pkg_dir=${BUILD_TEMP}/boot_pkg_revert
-		revert_zip=${BUILD_TEMP}/revert_boot_image_j${JOB_BUILD_NUMBER}_$(date +%Y%m%d)-${DEVICE_NAME}.zip
-		binary_target_dir=META-INF/com/google/android
-		install_target_dir=install/bin
-		blob_dir=blobs
-		proprietary_dir=proprietary
-
-		# create odin package
-		tar -C ${ANDROID_PRODUCT_OUT}/ boot.img -c -f ${BUILD_TEMP}/${boot_tar_name}
-
-		# create the directories
-		exit_on_failure mkdir -p ${boot_pkg_dir}/${binary_target_dir}
-		exit_on_failure mkdir -p ${boot_pkg_dir}/${blob_dir}
-		exit_on_failure mkdir -p ${boot_pkg_dir}/${proprietary_dir}
-		exit_on_failure mkdir -p ${boot_pkg_dir}/${install_target_dir}/installbegin
-		exit_on_failure mkdir -p ${boot_pkg_dir}/${install_target_dir}/installend
-		exit_on_failure mkdir -p ${boot_pkg_dir}/${install_target_dir}/postvalidate
-		exit_on_failure mkdir -p ${revert_pkg_dir}/${binary_target_dir}
-		exit_on_failure mkdir -p ${revert_pkg_dir}/${blob_dir}
-		exit_on_failure mkdir -p ${revert_pkg_dir}/${proprietary_dir}
-		exit_on_failure mkdir -p ${revert_pkg_dir}/${install_target_dir}/installbegin
-		exit_on_failure mkdir -p ${revert_pkg_dir}/${install_target_dir}/installend
-		exit_on_failure mkdir -p ${revert_pkg_dir}/${install_target_dir}/postvalidate
-
-
-		# download the update binary
-		echoTextBlue "Fetching update binary..."
-		${CURL} ${SCRIPT_REPO_URL}/updater/update-binary 1>${BUILD_TEMP}/update-binary 2>/dev/null
-		cp ${BUILD_TEMP}/update-binary ${revert_pkg_dir}/${binary_target_dir}
-
-		echoTextBlue "Fetching mkbootimg..."
-		${CURL} ${SCRIPT_REPO_URL}/bootimg-tools/mkbootimg 1>${BUILD_TEMP}/mkbootimg 2>/dev/null
-
-		echoTextBlue "Fetching unpackbootimg..."
-		${CURL} ${SCRIPT_REPO_URL}/bootimg-tools/unpackbootimg 1>${BUILD_TEMP}/unpackbootimg 2>/dev/null
-
-		if [ -e ${ANDROID_PRODUCT_OUT}/system/lib/modules/wlan.ko ]; then
-			echoTextBlue "Copying wifi module..."
-			cp ${ANDROID_PRODUCT_OUT}/system/lib/modules/wlan.ko ${boot_pkg_dir}/${blob_dir}/wlan.ko
-		fi
-
-		cp ${ANDROID_PRODUCT_OUT}/boot.img ${boot_pkg_dir}/${blob_dir}
-		cp ${BUILD_TEMP}/update-binary ${boot_pkg_dir}/${binary_target_dir}
-		cp ${BUILD_TEMP}/mkbootimg ${boot_pkg_dir}/${install_target_dir}
-		cp ${BUILD_TEMP}/unpackbootimg ${boot_pkg_dir}/${install_target_dir}
-
-		# Create the scripts
-		create_scripts
-
-		#archive the image
-		echoTextBlue "Creating flashables..."
-		cd ${boot_pkg_dir} && zip ${boot_pkg_zip} `find ${boot_pkg_dir} -type f | cut -c $(($(echo ${boot_pkg_dir}|wc -c)+1))-`
-		cd ${revert_pkg_dir} && zip ${revert_zip} `find ${revert_pkg_dir} -type f | cut -c $(($(echo ${revert_pkg_dir}|wc -c)+1))-`
-		echoTextBlue "Copying boot image..."
-		rsync_cp ${boot_pkg_zip} ${OUTPUT_DIR}/builds/boot/
-		rsync_cp ${BUILD_TEMP}/${boot_tar_name} ${OUTPUT_DIR}/builds/boot/
-
-		echoTextBlue "Copying reversion zip..."
-		rsync_cp ${revert_zip} ${OUTPUT_DIR}/builds/boot/
-	fi
-}
-
 function create_scripts {
 cat <<A_SCRIPT_F > ${boot_pkg_dir}/${binary_target_dir}/updater-script
 package_extract_dir("install", "/tmp/install");
@@ -356,5 +283,3 @@ cp ${boot_pkg_dir}/${install_target_dir}/postvalidate/copy_variant_blobs.sh ${re
 cp ${boot_pkg_dir}/${install_target_dir}/functions.sh ${revert_pkg_dir}/${install_target_dir}/functions.sh
 cp ${boot_pkg_dir}/${binary_target_dir}/updater-script ${revert_pkg_dir}/${binary_target_dir}/updater-script
 }
-
-COPY_FUNCTIONS=("${COPY_FUNCTIONS[@]}" "copy_bootimage")
