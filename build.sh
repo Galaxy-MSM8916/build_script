@@ -33,6 +33,8 @@ RETRY_COUNT=3
 # create a temprary working dir
 BUILD_TEMP=$(mktemp -d)
 
+ARTIFACT_OUT_DIR=${BUILD_TEMP}/builds
+
 CURL="curl --silent -connect-timeout=10"
 
 # file extraction function names
@@ -282,18 +284,30 @@ if [ "x$UPDATE_SCRIPT" == "x" ]; then
 		copy_files
 		# generate the changes
 		generate_changes
-		# end the build
-		print_end_build
 		# reverse any previously applied patch
 		reverse_patch
 		# reverse repo maps
 		reverse_repo_map
+		# clean build top
+		clean_target
+		# sync the build script
+		sync_script "$@"
+		# remove lock
+		remove_build_lock
+		# upload build artifacts
+		upload_artifacts
+		# end the build
+		print_end_build
 	fi
 fi
-# sync the build script
-sync_script "$@"
-# copy the target
-clean_target
+# remove temp dir
+remove_temp_dir
+if [ "x${BUILD_TARGET}" != "x" ] && [ "x${BUILD_VARIANT}" != "x" ] && [ "x${DEVICE_NAME}" != "x" ]; then
+	# sync the build script
+	sync_script "$@"
+	# remove lock
+	remove_build_lock
+fi
 
 END_TIME=$( date +%s )
 
