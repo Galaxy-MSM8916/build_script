@@ -251,6 +251,8 @@ if [ "x$UPDATE_SCRIPT" == "x" ]; then
 	extract_patches $@
 	# setup env vars
 	bootstrap "$@"
+	# restore a terminated build
+	restore_saved_build_state
 	# check if any other builds are running
 	check_if_build_running
 	# reverse any previously applied patch
@@ -272,6 +274,8 @@ if [ "x$UPDATE_SCRIPT" == "x" ]; then
 		setup_env "$@"
 		# print the build start text
 		print_start_build
+		#save build state
+		save_build_state
 		# make the targets
 		make_targets
 		# copy the files
