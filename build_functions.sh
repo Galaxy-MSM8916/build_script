@@ -54,16 +54,14 @@ function generate_changes {
 	kernel_dir=${ANDROID_BUILD_TOP}/kernel/${vendors[0]}/${kernel_name}
 	generate_log ${kernel_dir} >> ${BUILD_TEMP}/${changelog_name}
 
+	echo -e "\nDEVICE\n---------\n" >> ${BUILD_TEMP}/${changelog_name}
+	device_dir=${ANDROID_BUILD_TOP}/device/${vendors[0]}/${DEVICE_NAME}
+	generate_log ${device_dir} >> ${BUILD_TEMP}/${changelog_name}
+
+	echo -e "\nDEVICE-COMMON\n---------\n" >> ${BUILD_TEMP}/${changelog_name}
+	generate_log ${common_dir} >> ${BUILD_TEMP}/${changelog_name}
+
 	if [ "x$BUILD_TARGET" == "xotapackage" ]; then
-		#generate the changes
-
-		echo -e "\nDEVICE\n---------\n" >> ${BUILD_TEMP}/${changelog_name}
-		device_dir=${ANDROID_BUILD_TOP}/device/${vendors[0]}/${DEVICE_NAME}
-		generate_log ${device_dir} >> ${BUILD_TEMP}/${changelog_name}
-
-		echo -e "\nDEVICE-COMMON\n---------\n" >> ${BUILD_TEMP}/${changelog_name}
-		generate_log ${common_dir} >> ${BUILD_TEMP}/${changelog_name}
-
 		echo -e "\nVENDOR\n---------\n" >> ${BUILD_TEMP}/${changelog_name}
 		vendor_dir=${ANDROID_BUILD_TOP}/vendor/${vendors[0]}/${DEVICE_NAME}
 		generate_log ${vendor_dir} >> ${BUILD_TEMP}/${changelog_name}
