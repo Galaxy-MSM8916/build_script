@@ -47,27 +47,24 @@ function generate_changes {
 
 	changelog_name=changelog-${arc_name}.txt
 
-	echo -e "\nMSM8916-COMMON\n---------\n" > ${BUILD_TEMP}/${changelog_name}
-	generate_log ${platform_common_dir} >> ${BUILD_TEMP}/${changelog_name}
+	echo -e "\nMSM8916-COMMON\n---------\n" > ${ARTIFACT_OUT_DIR}/${changelog_name}
+	generate_log ${platform_common_dir} >> ${ARTIFACT_OUT_DIR}/${changelog_name}
 
-	echo -e "\nKERNEL\n---------\n" >> ${BUILD_TEMP}/${changelog_name}
+	echo -e "\nKERNEL\n---------\n" >> ${ARTIFACT_OUT_DIR}/${changelog_name}
 	kernel_dir=${ANDROID_BUILD_TOP}/kernel/${vendors[0]}/${kernel_name}
-	generate_log ${kernel_dir} >> ${BUILD_TEMP}/${changelog_name}
+	generate_log ${kernel_dir} >> ${ARTIFACT_OUT_DIR}/${changelog_name}
 
-	echo -e "\nDEVICE\n---------\n" >> ${BUILD_TEMP}/${changelog_name}
+	echo -e "\nDEVICE\n---------\n" >> ${ARTIFACT_OUT_DIR}/${changelog_name}
 	device_dir=${ANDROID_BUILD_TOP}/device/${vendors[0]}/${DEVICE_NAME}
-	generate_log ${device_dir} >> ${BUILD_TEMP}/${changelog_name}
+	generate_log ${device_dir} >> ${ARTIFACT_OUT_DIR}/${changelog_name}
 
-	echo -e "\nDEVICE-COMMON\n---------\n" >> ${BUILD_TEMP}/${changelog_name}
-	generate_log ${common_dir} >> ${BUILD_TEMP}/${changelog_name}
+	echo -e "\nDEVICE-COMMON\n---------\n" >> ${ARTIFACT_OUT_DIR}/${changelog_name}
+	generate_log ${common_dir} >> ${ARTIFACT_OUT_DIR}/${changelog_name}
 
 	if [ "x$BUILD_TARGET" == "xotapackage" ]; then
-		echo -e "\nVENDOR\n---------\n" >> ${BUILD_TEMP}/${changelog_name}
+		echo -e "\nVENDOR\n---------\n" >> ${ARTIFACT_OUT_DIR}/${changelog_name}
 		vendor_dir=${ANDROID_BUILD_TOP}/vendor/${vendors[0]}/${DEVICE_NAME}
-		generate_log ${vendor_dir} >> ${BUILD_TEMP}/${changelog_name}
-
+		generate_log ${vendor_dir} >> ${ARTIFACT_OUT_DIR}/${changelog_name}
 	fi
-
-	rsync_cp ${BUILD_TEMP}/${changelog_name} ${OUTPUT_DIR}/builds/full/${changelog_name}
 }
 

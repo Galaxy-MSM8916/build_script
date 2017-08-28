@@ -207,6 +207,7 @@ function setup_env {
 	# exit if there was an error
 	exit_error $?
 
-	#create the directories
-	exit_on_failure mkdir ${BUILD_TEMP}/ -p
+	# make the artifact dir
+	exit_on_failure mkdir -p $ARTIFACT_OUT_DIR
+
 }
