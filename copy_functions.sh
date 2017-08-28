@@ -115,17 +115,6 @@ function copy_otapackage {
 	fi
 }
 
-
-function copy_supackage {
-	if [ -e ${ANDROID_PRODUCT_OUT}/addonsu-arm.zip ]; then
-		logb "\n\t\tCopying su image..."
-		rsync_cp ${ANDROID_PRODUCT_OUT}/addonsu-arm.zip ${OUTPUT_DIR}/builds/su/addonsu-arm_j${JOB_BUILD_NUMBER}.zip
-	elif [ -e ${ANDROID_PRODUCT_OUT}/addonsu-${ver}-arm.zip ]; then
-		logb "\n\t\tCopying su image..."
-		rsync_cp ${ANDROID_PRODUCT_OUT}/addonsu-${ver}-arm.zip ${OUTPUT_DIR}/builds/su/addonsu-${ver}-arm_j${JOB_BUILD_NUMBER}.zip
-	fi
-}
-
 function copy_odin_package {
 	if [ "x$MAKE_ODIN_PACKAGE" == "x1" ]; then
 		#define some variables
@@ -164,7 +153,6 @@ function copy_odin_package {
 
 COPY_FUNCTIONS=("${COPY_FUNCTIONS[@]}" "copy_recoveryimage")
 COPY_FUNCTIONS=("${COPY_FUNCTIONS[@]}" "copy_otapackage")
-#COPY_FUNCTIONS=("${COPY_FUNCTIONS[@]}" "copy_supackage")
 COPY_FUNCTIONS=("${COPY_FUNCTIONS[@]}" "copy_odin_package")
 
 function copy_files {

@@ -24,10 +24,6 @@ function make_targets {
 	else
 		exit_on_failure make -j${JOB_NUMBER} $BUILD_TARGET CM_UPDATER_OTA_URI="cm.updater.uri=https://ota.msm8916.com/api" CM_BUILDTYPE=NIGHTLY
 	fi
-	#build su
-	#if [ $ver == "13.0" ] && [ "$BUILD_TARGET" != "recoveryimage" ] && [ "$BUILD_TARGET" != "bootimage" ]; then
-		#exit_on_failure make -j${JOB_NUMBER} addonsu
-	#fi
 }
 
 function generate_log {
