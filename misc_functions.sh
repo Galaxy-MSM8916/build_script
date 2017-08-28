@@ -196,14 +196,3 @@ function reportError() {
     fi
 }
 
-# PRINTS AN WARNING IN BOLD YELLOW
-function reportWarning() {
-    YELLOW="\033[01;33m"
-    RESTORE="\033[0m"
-
-    echo -e ""
-    echo -e ${YELLOW}"${1}"${RESTORE}
-    if [[ -z ${2} ]]; then
-        echo -e ""
-    fi
-}
