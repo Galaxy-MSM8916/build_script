@@ -33,10 +33,10 @@ function extract_patches {
 function apply_repo_map {
 	echoTextBold "Applying custom repository branch maps.."
 	count=0
-	for ix in `seq 0 $((${#REPO_BRANCH_MAP[@]}-1))`; do
+	for ix in `seq 0 $((${#REPO_REF_MAP[@]}-1))`; do
 		count=$((count+1))
-		repo=`echo ${REPO_BRANCH_MAP[$ix]} | cut -d ':' -f 1`
-		branch=`echo ${REPO_BRANCH_MAP[$ix]} | cut -d ':' -f 2`
+		repo=`echo ${REPO_REF_MAP[$ix]} | cut -d ':' -f 1`
+		branch=`echo ${REPO_REF_MAP[$ix]} | cut -d ':' -f 2`
 
 		if [ -d "${BUILD_TOP}/$repo" ]; then
 			local GIT="git -C ${BUILD_TOP}/$repo"
@@ -44,14 +44,10 @@ function apply_repo_map {
 			echoTextBlue "Repo is $repo. Reverting..."
 			cd ${BUILD_TOP} && repo sync $repo -d
 
-			echoTextBlue "Deleting repository branch $branch."
-			${GIT} branch -D $branch 2>/dev/null
-			echoTextBlue "Fetching repository branch $branch..."
-			${GIT} fetch github $branch
 			echoTextBlue "Removing rogue patches in $repo..."
 			${GIT} diff | patch -Rp1
-			echoTextBlue "Checking out repository branch $branch."
-			${GIT} checkout github/$branch
+			echoTextBlue "Fetching and checking out ref $ref..."
+			${GIT} fetch github $ref && ${GIT} checkout FETCH_HEAD
 		else
 			echoTextRed "Directory $repo does not exist!!"
 			exit_error 1
@@ -67,10 +63,10 @@ function apply_repo_map {
 function reverse_repo_map {
 	echoTextBold "Reversing custom repository branch maps.."
 	count=0
-	for ix in `seq 0 $((${#REPO_BRANCH_MAP[@]}-1))`; do
+	for ix in `seq 0 $((${#REPO_REF_MAP[@]}-1))`; do
 		count=$((count+1))
-		repo=`echo ${REPO_BRANCH_MAP[$ix]} | cut -d ':' -f 1`
-		branch=`echo ${REPO_BRANCH_MAP[$ix]} | cut -d ':' -f 2`
+		repo=`echo ${REPO_REF_MAP[$ix]} | cut -d ':' -f 1`
+		branch=`echo ${REPO_REF_MAP[$ix]} | cut -d ':' -f 2`
 
 		if [ -d "${BUILD_TOP}/$repo" ]; then
 			local GIT="git -C ${BUILD_TOP}/$repo"
@@ -78,8 +74,6 @@ function reverse_repo_map {
 			echoTextBlue "Repo is $repo.\n Reverting..."
 			cd ${BUILD_TOP} && repo sync $repo -d
 
-			echoTextBlue "Deleting repository branch $branch."
-			${GIT} branch -D $branch 2>/dev/null
 			echoTextBlue "Removing rogue patches in $repo..."
 			${GIT} diff | patch -Rp1
 		fi

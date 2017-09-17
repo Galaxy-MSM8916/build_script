@@ -46,7 +46,7 @@ PATCH_FUNCTIONS=();
 COPY_FUNCTIONS=();
 POST_COPY_FUNCTIONS=();
 
-REPO_BRANCH_MAP=();
+REPO_REF_MAP=();
 
 SCRIPT_REPO_URL="https://git.msm8916.com/Galaxy-MSM8916/build_script.git/plain"
 
@@ -89,7 +89,7 @@ function print_help {
                 log "  -o, --output\toutput path (path to jenkins archive dir)";
                 log "\nOptional commands:";
                 log "  -b\tbuild number";
-                log "\n  --branch-map\tSpecify branches to check out for particular repositories";
+                log "\n  --branch-map --ref-map\tSpecify branches to check out for particular repositories";
                 log "              \tin the form repo directory:branch, for example,";
                 log "              \t--branch-map vendor/samsung:cm-14.1-experimental ";
                 log "              \tThis option can be specified multiple times.\n ";
@@ -145,8 +145,8 @@ for index in `seq 1 ${#}`; do
 
 		# long options
 		--branch-map)
-			logb "\t\tBranch map $nextarg specified"
-			REPO_BRANCH_MAP=("${REPO_BRANCH_MAP[@]}" "$nextarg")
+			logb "\t\tRef map $nextarg specified"
+			REPO_REF_MAP=("${REPO_REF_MAP[@]}" "$nextarg")
 			;;
 		--clean)    CLEAN_TARGET_OUT=1 ;;
 		--device)   DEVICE_NAME=$nextarg ;;
@@ -164,6 +164,10 @@ for index in `seq 1 ${#}`; do
 		--output)   OUTPUT_DIR=$nextarg ;;
 		--path)     BUILD_TOP=`realpath $nextarg` ;;
 		--print-via-proxy) PRINT_VIA_PROXY=y ;;
+		--ref-map)
+			logb "\t\tRef map $nextarg specified"
+			REPO_REF_MAP=("${REPO_REF_MAP[@]}" "$nextarg")
+			;;
 		--retry)    RETRY_COUNT=$nextarg;;
 		--restored-state) RESTORED_BUILD_STATE=1 ;;
 		--silent)   SILENT=1 ;;
