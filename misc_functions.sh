@@ -65,7 +65,7 @@ function restore_saved_build_state {
 			launch_count=1
 			target_job_name=$(cat $state_file)
 
-			while [ -f "$state_file" ] && [ $launch_count -le $RETRY_COUNT ]; do
+			while [ -f "$state_file" ] && [ $launch_count -le $BUILD_RETRY_COUNT ]; do
 				matched=0
 				for i in $seen_job_names; do
 					if [ "$i" == "$target_job_name" ]; then
@@ -77,7 +77,7 @@ function restore_saved_build_state {
 				done
 				if [ "$matched" -eq 0 ]; then
 					remove_build_lock
-					echoText "[${launch_count}/${RETRY_COUNT}] Starting previously terminated build from saved build info.."
+					echoText "[${launch_count}/${BUILD_RETRY_COUNT}] Starting previously terminated build from saved build info.."
 					${SSH} build ${target_job_name} -s -v \
 					   -p "\"EXTRA_ARGS=--restored-state --node=$NODE_NAME\"" 1>/dev/null && rm -f $state_file
 					acquire_build_lock
@@ -98,7 +98,7 @@ function restore_saved_build_state {
 	fi
 
 	if [ -n "$TARGET_NODE" ] && [ "$TARGET_NODE" != "$NODE_NAME" ]; then
-		if [ -n "$NODE_UNAVAILABLE_COUNT" ] && [ "$NODE_UNAVAILABLE_COUNT" -lt $RETRY_COUNT ]; then
+		if [ -n "$NODE_UNAVAILABLE_COUNT" ] && [ "$NODE_UNAVAILABLE_COUNT" -lt $BUILD_RETRY_COUNT ]; then
 			echoTextRed "Build not running on same node as it was originally. Relaunching..."
 			${SSH} build ${JOB_NAME} -w \
 			     -p "\"EXTRA_ARGS=--restored-state --node-unavail-count=$((NODE_UNAVAILABLE_COUNT+1)) --node=$TARGET_NODE\"" && rm -f $BUILD_STATE_FILE
