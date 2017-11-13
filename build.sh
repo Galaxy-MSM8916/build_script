@@ -97,7 +97,9 @@ function print_help {
                 log "  -c, --odin\tbuild compressed (ODIN) images";
                 log "  -r, --clean\tclean build directory on completion";
                 log "  -N, --no-pack-bootimage\tDon't pack the bootimage into a zip.\n";
-                log "  -R, --retry\tRetry build resume/file upload this many times upon failure before giving up.";
+                log "  -R, --retry\tRetry build this many times upon failure before giving up.";
+                log "              \tDefault is 0 ";
+                log "  -U, --upload-retry\tRetry file upload this many times upon failure before giving up.";
                 log "              \tDefault is 3 ";
                 log "  -a, --sync_all\tSync entire build tree";
                 log "  -v, --sync\tSync device/kernel/vendor trees";
@@ -133,7 +135,8 @@ for index in `seq 1 ${#}`; do
 		-P) PRINT_VIA_PROXY=y ;;
 		-N) NO_PACK_BOOTIMAGE=1 ;;
 		-r) CLEAN_TARGET_OUT=1;;
-		-R) RETRY_COUNT=$nextarg;;
+		-R) BUILD_RETRY_COUNT=$nextarg;;
+		-U, UPLOAD_RETRY_COUNT=$nextarg;;
 		-s) SILENT=1 ;;
 		-t) BUILD_TARGET=$nextarg ;;
 		-u) WITH_SU=true ;;
@@ -168,7 +171,7 @@ for index in `seq 1 ${#}`; do
 			logb "\t\tRef map $nextarg specified"
 			REPO_REF_MAP=("${REPO_REF_MAP[@]}" "$nextarg")
 			;;
-		--retry)    RETRY_COUNT=$nextarg;;
+		--retry)    BUILD_RETRY_COUNT=$nextarg;;
 		--restored-state) RESTORED_BUILD_STATE=1 ;;
 		--silent)   SILENT=1 ;;
 		--su)       WITH_SU=true ;;
@@ -178,6 +181,7 @@ for index in `seq 1 ${#}`; do
 		--target)   BUILD_TARGET=$nextarg ;;
 		--type)     BUILD_VARIANT=$nextarg ;;
 		--update-script)  UPDATE_SCRIPT=1;;
+                --upload-retry) UPLOAD_RETRY_COUNT=$nextarg;;
 		--wifi-fix)
 			logb "\t\tBuilding separate wlan module";
 			SEPARATE_WLAN_MODULE=y
