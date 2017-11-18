@@ -121,7 +121,7 @@ function clean_target {
 	if [ "x${CLEAN_TARGET_OUT}" != "x" ] && [ ${CLEAN_TARGET_OUT} -eq 1 ]; then
 		echoText "Cleaning build dir..."
 		if [ "x$BUILD_TARGET" == "xotapackage" ]; then
-			make clean
+			rm -rf out
 		fi
 	fi
 }
