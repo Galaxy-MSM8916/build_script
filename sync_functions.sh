@@ -14,24 +14,18 @@
 # limitations under the License.
 
 function sync_manifests {
-	if [ "x$ver" == "x13.0" ]; then
-		manifest_name=los-13.0_manifest.xml
-	elif [ "x$ver" == "x14.1" ]; then
-		manifest_name=los-14.1_manifest.xml
-	elif [ "x$ver" == "x15.0" ]; then
-		manifest_name=los-15.0_manifest.xml
+	if [ "x$MANIFEST_NAME" == "x" ]; then
+		MANIFEST_NAME=los-${ver}_manifest.xml
 	fi
 	manifest_dir=${BUILD_TOP}/.repo/local_manifests
 	manifest_url="https://git.msm8916.com/Galaxy-MSM8916/local_manifests.git/plain"
 
-	if [ "x${manifest_name}" != "x" ]; then
-		mkdir -p ${manifest_dir}
-		logb "Removing old manifests..."
-		rm ${manifest_dir}/*xml
+	mkdir -p ${manifest_dir}
+	logb "Removing old manifests..."
+	rm ${manifest_dir}/*xml
 
-		logb "Syncing manifests..."
-		${CURL} ${manifest_url}/${manifest_name} | tee ${manifest_dir}/${manifest_name} > /dev/null
-	fi
+	logb "Syncing manifests..."
+	${CURL} ${manifest_url}/${MANIFEST_NAME} | tee ${manifest_dir}/${MANIFEST_NAME} > /dev/null
 
     # Sync the substratum manifest
 	if [ "x$ver" == "x14.1" ]; then

@@ -173,6 +173,9 @@ while [ "$1" != "" ]; do
 		-H | --host )
 			SYNC_HOST=$next_arg
 			;;
+		--manifest )
+			MANIFEST_NAME=$next_arg
+			;;
 		-N | --no-pack-bootimage)
 			NO_PACK_BOOTIMAGE=1
 			;;
