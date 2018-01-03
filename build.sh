@@ -104,6 +104,7 @@ function print_help {
                 log "  -s, --silent\tdon't publish to Telegram";
                 log "  -c, --odin\tbuild compressed (ODIN) images";
                 log "  -r, --clean\tclean build directory on completion";
+                log "  --make-args\tArguments to pass to make at build time.";
                 log "  -N, --no-pack-bootimage\tDon't pack the bootimage into a zip.\n";
                 log "  -R, --retry\tRetry build this many times upon failure before giving up.";
                 log "              \tDefault is 0 ";
@@ -172,6 +173,9 @@ while [ "$1" != "" ]; do
 			;;
 		-H | --host )
 			SYNC_HOST=$next_arg
+			;;
+		--make-args )
+			MAKE_ARGS="$MAKE_ARGS $next_arg"
 			;;
 		--manifest )
 			MANIFEST_NAME=$next_arg

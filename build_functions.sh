@@ -16,14 +16,15 @@
 function make_targets {
 	#start building
 	if [ "x$ver" == "x13.0" ]; then
-		exit_on_failure make -j${JOB_NUMBER} $BUILD_TARGET CM_UPDATER_OTA_URI="cm.updater.uri=https://ota13.msm8916.com/api" CM_BUILDTYPE=NIGHTLY
+		MAKE_ARGS+="CM_UPDATER_OTA_URI='cm.updater.uri=https://ota13.msm8916.com/api' CM_BUILDTYPE=NIGHTLY"
 	elif [ "x$ver" == "x14.1" ]; then
-		exit_on_failure make -j${JOB_NUMBER} $BUILD_TARGET CM_UPDATER_OTA_URI="cm.updater.uri=https://ota14.msm8916.com/api" CM_BUILDTYPE=NIGHTLY
+		MAKE_ARGS+="CM_UPDATER_OTA_URI='cm.updater.uri=https://ota14.msm8916.com/api' CM_BUILDTYPE=NIGHTLY"
 	elif [ "x$ver" == "x15.0" ]; then
-		exit_on_failure make -j${JOB_NUMBER} $BUILD_TARGET CM_UPDATER_OTA_URI="lineage.updater.uri=https://ota15.msm8916.com/api" LINEAGE_BUILDTYPE=NIGHTLY
+		MAKE_ARGS+="CM_UPDATER_OTA_URI='lineage.updater.uri=https://ota15.msm8916.com/api' LINEAGE_BUILDTYPE=NIGHTLY"
 	else
-		exit_on_failure make -j${JOB_NUMBER} $BUILD_TARGET CM_UPDATER_OTA_URI="cm.updater.uri=https://ota.msm8916.com/api" CM_BUILDTYPE=NIGHTLY
+		MAKE_ARGS+="CM_UPDATER_OTA_URI='lineage.updater.uri=https://ota.msm8916.com/api' LINEAGE_BUILDTYPE=NIGHTLY"
 	fi
+	exit_on_failure make -j${JOB_NUMBER} $BUILD_TARGET $MAKE_ARGS
 }
 
 function generate_log {
