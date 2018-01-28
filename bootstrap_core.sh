@@ -58,6 +58,10 @@ lineage
 cm
 RR"
 
+if [ -z "$recovery_variant" ]; then
+    recovery_variant=$(echo $@ | grep -o 'RECOVERY_VARIANT[ ]*:=[ ]*twrp' | sed s'/ //'g |cut -d':' -f2)
+fi
+
 function get_platform_info {
 	#move into the build dir
 	cd $BUILD_TOP
@@ -154,10 +158,14 @@ function get_platform_info {
 	logb "Distro is: ${distroTxt}/${DISTRIBUTION}-${ver} on platform ${platform_version}"
 
 	#set the recovery type
-	if [ -z "$RECOVERY_VARIANT" ]; then
-		recovery_variant=$(grep RECOVERY_VARIANT ${platform_common_dir}/BoardConfigCommon.mk 2>/dev/null | grep -v '#' | sed s'/ //'g |cut -d':' -f2)
-	else
+	if [ -z "$recovery_variant" ] && [ -n "$RECOVERY_VARIANT" ]; then
 		recovery_variant=$RECOVERY_VARIANT
+	fi
+	if [ -z "$recovery_variant" ]; then
+		recovery_variant=$(grep 'RECOVERY_VARIANT[ ]*:=[ ]*' ${platform_common_dir}/BoardConfigCommon.mk 2>/dev/null | grep -v '#' | sed s'/ //'g |cut -d':' -f2)
+	fi
+	if [ -z "$recovery_variant" ]; then
+		recovery_variant=$(grep 'RECOVERY_VARIANT[ ]*:=[ ]*' ${platform_common_dir}/board/*.mk | grep -v '#' | grep -o 'twrp')
 	fi
 	# get the release type
 	if [ "x${release_type}" == "x" ]; then
@@ -171,6 +179,7 @@ function get_platform_info {
 
 	# get the recovery type
 	if [ "$recovery_variant" == "twrp" ] && [ -d "${BUILD_TOP}/bootable/recovery-twrp" ]; then
+		export RECOVERY_VARIANT=twrp
 		[ -e "${BUILD_TOP}/bootable/recovery/variables.h" ] && TWRP_VAR_FILE="${BUILD_TOP}/bootable/recovery/variables.h"
 		[ -e "${BUILD_TOP}/bootable/recovery-twrp/variables.h" ] && TWRP_VAR_FILE="${BUILD_TOP}/bootable/recovery-twrp/variables.h"
 
