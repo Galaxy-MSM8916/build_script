@@ -56,7 +56,7 @@ DISTROS="
 omni
 lineage
 cm
-RR"
+rr"
 
 if [ -z "$recovery_variant" ]; then
     recovery_variant=$(echo $@ | grep -o 'RECOVERY_VARIANT[ ]*:=[ ]*[A-Za-z0-9]*' | sed s'/ //'g |cut -d':' -f2)
@@ -96,19 +96,25 @@ function get_platform_info {
 		if [ "x$DISTRIBUTION" == "xlineage" ]; then
 			ver="15.1"
 			distroTxt="LineageOS"
+		elif [ "x$DISTRIBUTION" == "xrr" ]; then
+			ver="oreo"
+			distroTxt="ResurrectionRemix"
 		fi
 	elif [ "`echo $platform_version | grep -o "8.0"`" == "8.0" ]; then
 		export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4g"
 		if [ "x$DISTRIBUTION" == "xlineage" ]; then
 			ver="15.0"
 			distroTxt="LineageOS"
+		elif [ "x$DISTRIBUTION" == "xrr" ]; then
+			ver="oreo"
+			distroTxt="ResurrectionRemix"
 		fi
 	elif [ "`echo $platform_version | grep -o "7.1"`" == "7.1" ]; then
 		export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4g"
 		if [ "x$DISTRIBUTION" == "xlineage" ]; then
 			ver="14.1"
 			distroTxt="LineageOS"
-		elif [ "x$DISTRIBUTION" == "xRR" ]; then
+		elif [ "x$DISTRIBUTION" == "xrr" ]; then
 			ver="5.8"
 			distroTxt="ResurrectionRemix"
 		elif [ "x$DISTRIBUTION" == "xcm" ]; then
@@ -122,9 +128,6 @@ function get_platform_info {
 		if [ "x$DISTRIBUTION" == "xlineage" ]; then
 			ver="13.0"
 			distroTxt="LineageOS"
-		elif [ "x$DISTRIBUTION" == "xRR" ]; then
-			ver="5.7"
-			distroTxt="ResurrectionRemix"
 		elif [ "x$DISTRIBUTION" == "xcm" ]; then
 			ver="13.0"
 			distroTxt="CyanogenMod"
@@ -196,7 +199,7 @@ function get_platform_info {
 		else
 			recovery_flavour="TWRP-2.8.7.0"
 		fi
-	elif [ "x$DISTRIBUTION" == "xlineage" ]; then
+	elif [ "x$DISTRIBUTION" == "xlineage" ] || [ "x$DISTRIBUTION" == "xrr" ]; then
 		recovery_flavour="LineageOSRecovery"
 	elif [ "x$DISTRIBUTION" == "xcm" ]; then
 		recovery_flavour="CyanogenModRecovery"
