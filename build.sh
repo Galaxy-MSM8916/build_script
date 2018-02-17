@@ -38,6 +38,9 @@ ARTIFACT_OUT_DIR=${BUILD_TEMP}/builds
 
 SAVED_BUILD_JOBS_DIR=/tmp/android_build_jobs
 
+#changelog
+CHANGELOG_DAYS=7
+
 CURL="curl --silent -connect-timeout=10"
 
 # file extraction function names
@@ -103,6 +106,7 @@ function print_help {
                 log "              \tcan be called repeatedly with each change. ";
                 log "  -s, --silent\tdon't publish to Telegram";
                 log "  -c, --odin\tbuild compressed (ODIN) images";
+                log "  --days\tNumber of days of changelogs to generate";
                 log "  -r, --clean\tclean build directory on completion";
                 log "  --make-args\tArguments to pass to make at build time.";
                 log "  -N, --no-pack-bootimage\tDon't pack the bootimage into a zip.\n";
@@ -149,6 +153,9 @@ while [ "$1" != "" ]; do
 			;;
 		-d )
 			DISTRIBUTION=$next_arg
+			;;
+		--days )
+			CHANGELOG_DAYS=$next_arg
 			;;
 		--device )
 			DEVICE_NAME=$next_arg
