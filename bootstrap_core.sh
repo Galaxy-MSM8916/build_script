@@ -63,6 +63,50 @@ if [ -z "$recovery_variant" ]; then
 fi
 
 function get_platform_info {
+	# try to get distribution version from path
+	if [ "x$DISTRIBUTION" == "x" ]; then
+		for i in ${DISTROS}; do
+			if [ `echo $BUILD_TOP | grep -o $i | wc -c` -gt 1 ]; then
+				DISTRIBUTION=`echo $BUILD_TOP | grep -o $i`
+				ver=`echo $BUILD_TOP |grep $i | cut -d '-' -f 2`
+				logr "Guessed distribution is ${DISTRIBUTION} ${ver}"
+			fi
+		done
+	fi
+
+	if [ "x$DISTRIBUTION" == "x" ] || [ "x$ver" == "x" ]; then
+		logr "Error: Cannot automatically initialise distribution repo - no distribution specified"
+		exit_error 1
+	fi
+
+	if ! [ -d "$BUILD_TOP" ] || ! [ -d "$BUILD_TOP/.repo" ]; then
+
+		mkdir $BUILD_TOP
+
+		cd $BUILD_TOP
+
+		echo "Initialising distribution source repo..."
+		if [ "x$DISTRIBUTION" == "xlineage" ]; then
+			 exit_on_failure repo init -u git://github.com/LineageOS/android.git -b lineage-${ver} --depth=1
+		elif [ "x$DISTRIBUTION" == "xrr" ]; then
+			 exit_on_failure repo init -u https://github.com/ResurrectionRemix/platform_manifest.git -b ${ver} --depth=1
+		fi
+
+		sync_manifests
+
+		sync_all_old=$SYNC_ALL
+
+		SYNC_ALL=1
+
+		sync_all_trees
+
+		if [ "x$sync_all_old" == "x" ]; then
+                	SYNC_ALL=
+                else
+			SYNC_ALL=$sync_all_old
+		fi
+	fi
+
 	#move into the build dir
 	cd $BUILD_TOP
 
@@ -75,21 +119,6 @@ function get_platform_info {
 	fi
 
 	export WITH_SU
-
-	# try to get distribution version from path
-	if [ "x$DISTRIBUTION" == "x" ]; then
-		for i in ${DISTROS}; do
-			if [ `echo $BUILD_TOP | grep -o $i | wc -c` -gt 1 ]; then
-				DISTRIBUTION=`echo $BUILD_TOP | grep -o $i`
-				logr "Guessed distribution is $DISTRIBUTION/`echo $BUILD_TOP | grep -o $i`"
-			fi
-		done
-	fi
-
-	if [ "x$DISTRIBUTION" == "x" ]; then
-		logr "Error: No distribution specified!"
-		exit_error 1
-	fi
 
 	if [ "`echo $platform_version | grep -o "8.1"`" == "8.1" ]; then
 		export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4g"
