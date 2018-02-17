@@ -220,7 +220,6 @@ function setup_env {
 	cd $BUILD_TOP
 
 	BUILD_TYPE=2
-	CHANGELOG_DAYS=3
 
 	#set up the environment
 	if [ "x$DISTRIBUTION" == "xrr" ]; then

@@ -31,7 +31,7 @@ function generate_log {
 	# generate_log /path/to/git/tree
 
 	# try to use a preset time (7 days ago)
-	dates=$(date -d "`date` - 7 days" +%Y%m%d)
+	dates=$(date -d "`date` - $CHANGELOG_DAYS days" +%Y%m%d)
 	GIT_PATH=$1
 	LOG=`git -C $GIT_PATH log --decorate=full --since=$(date -d ${dates[0]} +%m-%d-%Y)`
 
