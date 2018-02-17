@@ -35,7 +35,6 @@
 
 # DO NOT EDIT THIS
 SUBS_REPOS="
-frameworks/base
 frameworks/native
 packages/apps/Contacts
 packages/apps/ContactsCommon
@@ -48,6 +47,7 @@ system/sepolicy
 vendor/cm"
 
 LOCAL_SUBS_REPOS="
+frameworks/base
 packages/apps/Settings
 vendor/cm"
 
