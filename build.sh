@@ -358,6 +358,8 @@ if [ "x$UPDATE_SCRIPT" == "x" ]; then
         setup_env "$@"
         # apply repopicks
         apply_repopicks
+        # clean build top
+        clean_target
         # print the build start text
         print_start_build
         #save build state
@@ -370,8 +372,6 @@ if [ "x$UPDATE_SCRIPT" == "x" ]; then
         generate_changes
         # reverse repo maps
         reverse_repo_map
-        # clean build top
-        clean_target
         # sync the build script
         sync_script "$@"
         # remove lock
