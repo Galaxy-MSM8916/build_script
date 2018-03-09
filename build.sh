@@ -364,14 +364,16 @@ if [ "x$UPDATE_SCRIPT" == "x" ]; then
         save_build_state "$@"
         # make the targets
         make_targets
+        # clean build top
+        clean_out        
         # copy the files
         copy_files
         # generate the changes
         generate_changes
         # reverse repo maps
         reverse_repo_map
-        # clean build top
-        clean_target
+        # clean build state
+        clean_state
         # sync the build script
         sync_script "$@"
         # remove lock
