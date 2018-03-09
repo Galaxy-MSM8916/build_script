@@ -354,6 +354,8 @@ if [ "x$UPDATE_SCRIPT" == "x" ]; then
     if [ "x${BUILD_TARGET}" != "x" ] && [ "x${BUILD_VARIANT}" != "x" ] && [ "x${DEVICE_NAME}" != "x" ]; then
         # apply custom repo-branch maps
         apply_repo_map
+        # clean build top
+        clean_out
         # setup the build environment
         setup_env "$@"
         # apply repopicks
@@ -370,8 +372,8 @@ if [ "x$UPDATE_SCRIPT" == "x" ]; then
         generate_changes
         # reverse repo maps
         reverse_repo_map
-        # clean build top
-        clean_target
+        # clean build state
+        clean_state
         # sync the build script
         sync_script "$@"
         # remove lock
