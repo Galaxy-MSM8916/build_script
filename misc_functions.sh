@@ -112,11 +112,7 @@ function restore_saved_build_state {
     fi
 }
 
-function clean_target {
-    echoText "Removing saved build state info.."
-    rm -f ${BUILD_STATE_FILE}
-    rmdir --ignore-fail-on-non-empty ${SAVED_BUILD_JOBS_DIR}
-
+function clean_out {
     cd ${ANDROID_BUILD_TOP}/
     if [ "x${CLEAN_TARGET_OUT}" != "x" ] && [ ${CLEAN_TARGET_OUT} -eq 1 ]; then
         echoText "Cleaning build dir..."
@@ -124,6 +120,13 @@ function clean_target {
             rm -rf out
         fi
     fi
+}
+
+function clean_target {
+    echoText "Removing saved build state info.."
+    rm -f ${BUILD_STATE_FILE}
+    rmdir --ignore-fail-on-non-empty ${SAVED_BUILD_JOBS_DIR}
+
 }
 
 function remove_temp_dir {

@@ -358,6 +358,8 @@ if [ "x$UPDATE_SCRIPT" == "x" ]; then
         setup_env "$@"
         # apply repopicks
         apply_repopicks
+        # clean build top
+        clean_out
         # print the build start text
         print_start_build
         #save build state
