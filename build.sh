@@ -350,6 +350,8 @@ if [ "x$UPDATE_SCRIPT" == "x" ]; then
     # sync the repos
     sync_vendor_trees "$@"
     sync_all_trees "$@"
+    # clean build top
+    clean_out
 
     if [ "x${BUILD_TARGET}" != "x" ] && [ "x${BUILD_VARIANT}" != "x" ] && [ "x${DEVICE_NAME}" != "x" ]; then
         # apply custom repo-branch maps
@@ -370,8 +372,8 @@ if [ "x$UPDATE_SCRIPT" == "x" ]; then
         generate_changes
         # reverse repo maps
         reverse_repo_map
-        # clean build top
-        clean_target
+        # clean build state
+        clean_state
         # sync the build script
         sync_script "$@"
         # remove lock
