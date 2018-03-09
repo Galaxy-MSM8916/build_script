@@ -112,18 +112,18 @@ function restore_saved_build_state {
     fi
 }
 
-function clean_target {
+function clean_out {
+    if [ "x${CLEAN_TARGET_OUT}" != "x" ] && [ ${CLEAN_TARGET_OUT} -eq 1 ]; then
+        echoText "Cleaning build dir..."
+        rm -rf out
+    fi
+}
+
+function clean_state {
     echoText "Removing saved build state info.."
     rm -f ${BUILD_STATE_FILE}
     rmdir --ignore-fail-on-non-empty ${SAVED_BUILD_JOBS_DIR}
 
-    cd ${ANDROID_BUILD_TOP}/
-    if [ "x${CLEAN_TARGET_OUT}" != "x" ] && [ ${CLEAN_TARGET_OUT} -eq 1 ]; then
-        echoText "Cleaning build dir..."
-        if [ "x$BUILD_TARGET" == "xotapackage" ]; then
-            rm -rf out
-        fi
-    fi
 }
 
 function remove_temp_dir {
