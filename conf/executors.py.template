@@ -1,1 +1,8 @@
 #!/usr/bin/env python3
+
+executors = {
+        "skyvm" : { "host": "skyvm.msm8916.com", "executors": 2, "jobnum": 8 },
+        }
+
+envvars = { "CCACHE_MAXSIZE" : "100G",
+        }
