@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
 versions = {
-        "7.1": [ "N", "Nougat", "nougat", "14.1" ],
-        "8.1": [ "O", "Oreo", "oreo", "15.1" ],
-        }
+    "7.1": [ "N", "Nougat", "nougat", "14.1" ],
+    "8.1": [ "O", "Oreo", "oreo", "15.1" ],
+}
 
 # targets
 targets = [ "otapackage", "recoveryimage", "bootimage" ]
 
 distros = {
-        "lineage" : { "name": "LineageOS", "versions": ["14.1", "15.1"], "prefix": "los"},
-        "lineage-go" : { "name": "LineageOS Go", "versions": ["15.1"], "prefix": "los-go"},
-        "rr" : { "name": "RessurectionRemix", "versions": ["oreo"], "prefix": "rr"},
-        }
+    "lineage" : { "name": "LineageOS", "versions": ["14.1", "15.1"], "prefix": "los"},
+    "lineage-go" : { "name": "LineageOS Go", "versions": ["15.1"], "prefix": "los-go"},
+    "rr" : { "name": "RessurectionRemix", "versions": ["oreo"], "prefix": "rr"},
+}
