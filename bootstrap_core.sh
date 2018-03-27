@@ -203,7 +203,10 @@ function get_platform_info {
         recovery_variant=$(grep 'RECOVERY_VARIANT[ ]*:=[ ]*' ${platform_common_dir}/BoardConfigCommon.mk 2>/dev/null | grep -v '#' | sed s'/ //'g |cut -d':' -f2)
     fi
     if [ -z "$recovery_variant" ]; then
-        recovery_variant=$(grep 'RECOVERY_VARIANT[ ]*:=[ ]*' ${platform_common_dir}/board/*.mk | grep -v '#' | grep -o 'twrp')
+        recovery_variant=$(grep 'RECOVERY_VARIANT[ ]*:=[ ]*' ${platform_common_dir}/board/*.mk | grep -v '#' | grep -o 'twrp' | sort | uniq)
+    fi
+    if [ x`echo ${JOB_NAME} | grep -o 'twrp'` == "xtwrp" ]; then
+	recovery_variant="twrp"
     fi
     # get the release type
     if [ "x${release_type}" == "x" ]; then
