@@ -50,26 +50,26 @@ function generate_changes {
 
     if [ -e ${ANDROID_BUILD_TOP}/CHANGELOG.mkdn ]; then
         cp ${ANDROID_BUILD_TOP}/CHANGELOG.mkdn ${ARTIFACT_OUT_DIR}/${changelog_name}
-    else
-        echo -e "\nMSM8916-COMMON\n---------\n" > ${ARTIFACT_OUT_DIR}/${changelog_name}
-        generate_log ${platform_common_dir} >> ${ARTIFACT_OUT_DIR}/${changelog_name}
+    fi
 
-        echo -e "\nKERNEL\n---------\n" >> ${ARTIFACT_OUT_DIR}/${changelog_name}
-        kernel_dir=${ANDROID_BUILD_TOP}/kernel/${vendors[0]}/${kernel_name}
-        generate_log ${kernel_dir} >> ${ARTIFACT_OUT_DIR}/${changelog_name}
+    echo -e "\nMSM8916-COMMON\n---------\n" >> ${ARTIFACT_OUT_DIR}/${changelog_name}
+    generate_log ${platform_common_dir} >> ${ARTIFACT_OUT_DIR}/${changelog_name}
 
-        echo -e "\nDEVICE\n---------\n" >> ${ARTIFACT_OUT_DIR}/${changelog_name}
-        device_dir=${ANDROID_BUILD_TOP}/device/${vendors[0]}/${DEVICE_NAME}
-        generate_log ${device_dir} >> ${ARTIFACT_OUT_DIR}/${changelog_name}
+    echo -e "\nKERNEL\n---------\n" >> ${ARTIFACT_OUT_DIR}/${changelog_name}
+    kernel_dir=${ANDROID_BUILD_TOP}/kernel/${vendors[0]}/${kernel_name}
+    generate_log ${kernel_dir} >> ${ARTIFACT_OUT_DIR}/${changelog_name}
 
-        echo -e "\nDEVICE-COMMON\n---------\n" >> ${ARTIFACT_OUT_DIR}/${changelog_name}
-        generate_log ${common_dir} >> ${ARTIFACT_OUT_DIR}/${changelog_name}
+    echo -e "\nDEVICE\n---------\n" >> ${ARTIFACT_OUT_DIR}/${changelog_name}
+    device_dir=${ANDROID_BUILD_TOP}/device/${vendors[0]}/${DEVICE_NAME}
+    generate_log ${device_dir} >> ${ARTIFACT_OUT_DIR}/${changelog_name}
 
-        if [ "x$BUILD_TARGET" == "xotapackage" ]; then
-            echo -e "\nVENDOR\n---------\n" >> ${ARTIFACT_OUT_DIR}/${changelog_name}
-            vendor_dir=${ANDROID_BUILD_TOP}/vendor/${vendors[0]}
-            generate_log ${vendor_dir} >> ${ARTIFACT_OUT_DIR}/${changelog_name}
-        fi
+    echo -e "\nDEVICE-COMMON\n---------\n" >> ${ARTIFACT_OUT_DIR}/${changelog_name}
+    generate_log ${common_dir} >> ${ARTIFACT_OUT_DIR}/${changelog_name}
+
+    if [ "x$BUILD_TARGET" == "xotapackage" ]; then
+        echo -e "\nVENDOR\n---------\n" >> ${ARTIFACT_OUT_DIR}/${changelog_name}
+        vendor_dir=${ANDROID_BUILD_TOP}/vendor/${vendors[0]}
+        generate_log ${vendor_dir} >> ${ARTIFACT_OUT_DIR}/${changelog_name}
     fi
 }
 
