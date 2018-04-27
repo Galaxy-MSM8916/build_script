@@ -46,10 +46,10 @@ function print_start_build {
             textStr+="%0A%0AThis build is running on ${USER}@${HOSTNAME}"
             textStr+="%0A%0AStart time: ${dateStr}"
 
-            #if [ "x${JOB_URL}" != "x" ]; then
-            #    textStr+="%0A%0AYou can monitor this build's progress at:"
-            #    textStr+="%0A${JOB_URL}/console"
-            #fi
+            if [ "x${JOB_URL}" != "x" ]; then
+                textStr+="%0A%0AYou can monitor this build's progress at:"
+                textStr+="%0A${JOB_URL}/console"
+            fi
 
             if [ "x$PRINT_VIA_PROXY" != "x" ] && [ "x$SYNC_HOST" != "x" ]; then
                 timeout -s 9 20 ssh $SYNC_HOST wget \'"https://api.telegram.org/bot${BUILD_TELEGRAM_TOKEN}/sendMessage?chat_id=${BUILD_TELEGRAM_CHATID}&text=$textStr"\' -O - > /dev/null 2>/dev/null
