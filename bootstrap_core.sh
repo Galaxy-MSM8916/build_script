@@ -65,6 +65,7 @@ omni
 lineage
 cm
 rr
+AOSPA
 dotOS"
 
 if [ -z "$recovery_variant" ]; then
@@ -101,6 +102,8 @@ function get_platform_info {
              exit_on_failure repo init -u https://github.com/ResurrectionRemix/platform_manifest.git -b ${ver} --depth=1
         elif [ "x$DISTRIBUTION" == "xdotOS" ]; then
              exit_on_failure repo init -u git://github.com/DotOS/manifest.git -b dot-${ver} --depth=1
+        elif [ "x$DISTRIBUTION" == "xAOSPA" ]; then
+	     exit_on_failure repo init -u git://github.com/AOSPA/manifest -b ${ver} --depth=1
         fi
 
         sync_manifests
@@ -139,6 +142,9 @@ function get_platform_info {
         elif [ "x$DISTRIBUTION" == "xrr" ]; then
             ver="oreo"
             distroTxt="ResurrectionRemix"
+        elif [ "x$DISTRIBUTION" == "xAOSPA" ]; then
+            ver="oreo-mr1"
+            distroTxt="Paranoid Android"
         fi
     elif [ "`echo $platform_version | grep -o "8.0"`" == "8.0" ]; then
         export JACK_SERVER_VM_ARGUMENTS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4g"
@@ -245,7 +251,7 @@ function get_platform_info {
         else
             recovery_flavour="TWRP-2.8.7.0"
         fi
-    elif [ "x$DISTRIBUTION" == "xlineage" ] || [ "x$DISTRIBUTION" == "xrr" ]; then
+    elif [ "x$DISTRIBUTION" == "xlineage" ] || [ "x$DISTRIBUTION" == "xrr" ] || [ "x$DISTRIBUTION" == "xAOSPA" ];; then
         recovery_flavour="LineageOSRecovery"
     elif [ "x$DISTRIBUTION" == "xdotOS" ]; then
         recovery_flavour="dotOSRecovery"
